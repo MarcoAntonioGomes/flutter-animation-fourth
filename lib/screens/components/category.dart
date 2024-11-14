@@ -15,13 +15,41 @@ class Category extends StatefulWidget {
   State<Category> createState() => _CategoryState();
 }
 
-class _CategoryState extends State<Category> {
+class _CategoryState extends State<Category> with SingleTickerProviderStateMixin{
   final ApiController apiController = ApiController();
 
   Future<List<Entry>> getEntries() async {
     return await apiController.getEntriesByCategory(category: widget.category);
   }
 
+
+  late AnimationController _animationController;
+
+
+  @override
+  void initState() {
+    _animationController = AnimationController(
+        vsync: this,
+        duration: const Duration(seconds: 1),
+        lowerBound: 0.8,
+        upperBound: 1,
+    );
+    if(widget.isHighligh){
+      _animationController.repeat(
+        reverse: true
+      );
+    }else{
+      _animationController.animateTo(1);
+    }
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +86,7 @@ class _CategoryState extends State<Category> {
                   ]),
               child: ScaleTransition(
                 alignment: Alignment.center,
-                scale: ,
+                scale: _animationController ,
                 child: Center(
                   child: Image.asset(
                     "$iconPath${widget.category}.png",
